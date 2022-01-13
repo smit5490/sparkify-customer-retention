@@ -1,5 +1,10 @@
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
+
+.idea/
+data/mini_sparkify_event_data.json
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

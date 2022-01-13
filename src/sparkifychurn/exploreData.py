@@ -21,9 +21,15 @@ def summarize_missing_vals(df):
     total_cnt = df.count()
 
     for feature in df.columns:
-        miss_cnt = df.filter(F.isnull(feature) | F.isnan(feature)).count()
-        missing_cnt_list.append(miss_cnt)
-        missing_pct_list.append(round((miss_cnt / total_cnt) * 100, 2))
+        if df.select(feature).dtypes[0][1] == "timestamp":
+            miss_cnt = df.filter(F.isnull(feature)).count()
+            missing_cnt_list.append(miss_cnt)
+            missing_pct_list.append(round((miss_cnt / total_cnt) * 100, 2))
+
+        else:
+            miss_cnt = df.filter(F.isnull(feature) | F.isnan(feature)).count()
+            missing_cnt_list.append(miss_cnt)
+            missing_pct_list.append(round((miss_cnt / total_cnt) * 100, 2))
 
         if df.select(feature).dtypes[0][1] == "string":
             empty_cnt = df.filter(F.trim(F.col(feature)) == "").count()
