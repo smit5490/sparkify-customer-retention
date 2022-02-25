@@ -78,4 +78,6 @@ def generate_features(clean_df):
         .withColumn("non_song_interaction_rate",
                     F.col("non_song_interaction_count") / F.col("sum_session_length_hours"))
 
+    user_summary = user_summary.fillna(0)
+
     return user_summary

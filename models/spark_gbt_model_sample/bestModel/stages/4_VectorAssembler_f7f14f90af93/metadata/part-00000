@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1645415984946,"sparkVersion":"3.2.0","uid":"VectorAssembler_f7f14f90af93","paramMap":{"outputCol":"features","inputCols":["gender_ohe","scaled_features","paid","submit_upgrade"]},"defaultParamMap":{"handleInvalid":"error","outputCol":"VectorAssembler_f7f14f90af93__output"}}

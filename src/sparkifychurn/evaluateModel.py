@@ -6,9 +6,10 @@ from sklearn.metrics import roc_curve, auc, f1_score, precision_recall_curve, av
 import plotly.express as px
 
 
-def evaluate_model(model, model_name, output_path, train, test):
+def evaluate_model(model, model_type, model_name, output_path, train, test):
     """
     :param model:
+    :param model_type:
     :param model_name:
     :param output_path:
     :param train:
@@ -16,12 +17,37 @@ def evaluate_model(model, model_name, output_path, train, test):
     :return:
     """
 
-    train_results = model.transform(train)
-    test_results = model.transform(test)
+    if model_type == "pyspark":
+        train_results = model.transform(train)
+        test_results = model.transform(test)
 
-    train_preds = train_results.select("churn", "prediction",
-                                       utils.first_element("probability").alias("prob")).toPandas()
-    test_preds = test_results.select("churn", "prediction", utils.first_element("probability").alias("prob")).toPandas()
+        train_preds = train_results.select("churn", "prediction",
+                                            utils.first_element("probability").alias("prob")).toPandas()
+        test_preds = test_results.select("churn", "prediction", utils.first_element("probability").alias("prob")).toPandas()
+
+    elif model_type == "sklearn":
+
+        # Split dep. vs indep. variables:
+        X_train = train.drop("churn", axis=1)
+        y_train = train["churn"]
+        X_test = test.drop("churn", axis=1)
+        y_test = test["churn"]
+
+        # Predictions on training and test data
+        train_probs = model.predict_proba(X_train)
+        train_preds = model.predict(X_train)
+        test_probs = model.predict_proba(X_test)
+        test_preds = model.predict(X_test)
+
+        # Add predictions to training and test data
+        train['prob'] = train_probs[:, 1]
+        train["prediction"] = train_preds
+        test['prob'] = test_probs[:, 1]
+        test["prediction"] = test_preds
+
+        # Final prediction dataframe to be used for evaluation
+        train_preds = train[["churn", "prediction", "prob"]]
+        test_preds = test[["churn", "prediction", "prob"]]
 
     fig, ax = plt.subplots(figsize=(8, 6))
     sns.set(font_scale=1.25)
@@ -108,7 +134,7 @@ def evaluate_model(model, model_name, output_path, train, test):
     ax.set_ylim([0.0, 1.05])
     ax.set_xlabel("Recall")
     ax.set_ylabel("Precision")
-    ax.set_title("Precision Recall Curve for Logistic Regression")
+    ax.set_title("Precision Recall Curve for {}".format(model_name))
     ax.legend(loc="lower right")
     fig.savefig("{}/{}_PR.png".format(output_path, model_name))
 

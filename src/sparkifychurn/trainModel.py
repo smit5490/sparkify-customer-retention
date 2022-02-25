@@ -1,25 +1,25 @@
 from pyspark.ml import Pipeline
-from pyspark.ml.pipeline import PipelineModel
 from pyspark.ml.feature import OneHotEncoder, StandardScaler, VectorAssembler, StringIndexer
 from pyspark.ml.classification import LogisticRegression, GBTClassifier
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 from pyspark.ml.evaluation import BinaryClassificationEvaluator
 
 
-
-def train_lr_model(num_folds, train, features_to_scale):
+def train_lr_model(num_folds, train, features_to_scale, binary_features):
     """ Set-up and fits cross-validated model pipeline.
     Defaults to penalized logistic regression.
 
     :param num_folds:
     :param train:
+    :param features_to_scale:
     :return:
     """
 
-    si = StringIndexer(inputCol="gender", outputCol="gender_idx")
+    si = StringIndexer(inputCol="gender", outputCol="gender_idx", handleInvalid="keep")
 
     ohe = OneHotEncoder(inputCol="gender_idx",
-                        outputCol="gender_ohe")
+                        outputCol="gender_ohe",
+                        handleInvalid="keep")
 
     va_sc = VectorAssembler(inputCols=features_to_scale, outputCol="features_to_scale")
 
@@ -28,7 +28,7 @@ def train_lr_model(num_folds, train, features_to_scale):
                         withMean=True,
                         withStd=True)
 
-    va = VectorAssembler(inputCols=["gender_ohe", "scaled_features"],
+    va = VectorAssembler(inputCols=["gender_ohe", "scaled_features", *binary_features],
                          outputCol="features")
 
     model = LogisticRegression(featuresCol="features", labelCol="churn", standardization=False)
@@ -52,18 +52,20 @@ def train_lr_model(num_folds, train, features_to_scale):
     return cv_model
 
 
-def train_gbt_model(num_folds, train, features_to_scale):
+def train_gbt_model(num_folds, train, features_to_scale, binary_features):
     """ Set-up and fits cross-validated model pipeline for GBT classifier.
 
+    :param features_to_scale:
     :param num_folds:
     :param train:
     :return:
     """
 
-    si = StringIndexer(inputCol="gender", outputCol="gender_idx")
+    si = StringIndexer(inputCol="gender", outputCol="gender_idx", handleInvalid="keep")
 
     ohe = OneHotEncoder(inputCol="gender_idx",
-                        outputCol="gender_ohe")
+                        outputCol="gender_ohe",
+                        handleInvalid="keep")
 
     va_sc = VectorAssembler(inputCols=features_to_scale, outputCol="features_to_scale")
 
@@ -72,7 +74,7 @@ def train_gbt_model(num_folds, train, features_to_scale):
                         withMean=True,
                         withStd=True)
 
-    va = VectorAssembler(inputCols=["gender_ohe", "scaled_features"],
+    va = VectorAssembler(inputCols=["gender_ohe", "scaled_features", *binary_features],
                          outputCol="features")
 
     model = GBTClassifier(featuresCol="features", labelCol="churn")
@@ -94,9 +96,3 @@ def train_gbt_model(num_folds, train, features_to_scale):
     cv_model = model_crossval.fit(train)
 
     return cv_model
-
-
-
-
-
-

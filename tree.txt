@@ -1,0 +1,80 @@
+.
+├── README.md
+├── app.py
+├── data
+│   ├── mini_sparkify_event_data.json
+│   ├── test_data_full
+│   ├── test_data_sample
+│   ├── train_data_full
+│   └── train_data_sample
+├── images
+│   ├── db_screenshot.png
+│   ├── sparkify.png
+│   └── st_app.png
+├── models
+│   ├── gbt_model_sample
+│   ├── sklearn_gbc_full.pkl
+│   ├── sklearn_gbc_sample.pkl
+│   ├── sklearn_lr_full.pkl
+│   ├── sklearn_lr_sample.pkl
+│   ├── spark_gbt_model_sample
+│   └── spark_lr_model_sample
+├── notebooks
+│   ├── 1_databricks_cleaning_feature_engineering_full_data.ipynb
+│   ├── 1_eda_cleaning_feature_engineering_sample.ipynb
+│   ├── 2_databricks_train_eval_spark_model_full_data.ipynb
+│   ├── 2_sklearn_model_training_evaluation_full.ipynb
+│   ├── 2_sklearn_model_training_evaluation_sample.ipynb
+│   ├── 2_spark_model_training_evaluation_sample.ipynb
+│   └── 3_prediction_explainers.ipynb
+├── output
+│   ├── pyspark
+│   │   ├── full
+│   │   │   ├── GBT_Classifier_PR.png
+│   │   │   ├── GBT_Classifier_ROC.png
+│   │   │   ├── GBT_Classifier_test_cm.png
+│   │   │   ├── GBT_Classifier_train_cm.png
+│   │   │   ├── Logistic_Regression_PR.png
+│   │   │   ├── Logistic_Regression_ROC.png
+│   │   │   ├── Logistic_Regression_test_cm.png
+│   │   │   └── Logistic_Regression_train_cm.png
+│   │   └── sample
+│   │       ├── GBT_PR.png
+│   │       ├── GBT_ROC.png
+│   │       ├── GBT_test_cm.png
+│   │       ├── GBT_train_cm.png
+│   │       ├── Logistic_Regression_PR.png
+│   │       ├── Logistic_Regression_ROC.png
+│   │       ├── Logistic_Regression_test_cm.png
+│   │       └── Logistic_Regression_train_cm.png
+│   ├── shap_summary.png
+│   └── sklearn
+│       ├── full
+│       │   ├── HistGradientBoostingClassifier_PR.png
+│       │   ├── HistGradientBoostingClassifier_ROC.png
+│       │   ├── HistGradientBoostingClassifier_test_cm.png
+│       │   ├── HistGradientBoostingClassifier_train_cm.png
+│       │   ├── Logistic_Regression_PR.png
+│       │   ├── Logistic_Regression_ROC.png
+│       │   ├── Logistic_Regression_test_cm.png
+│       │   └── Logistic_Regression_train_cm.png
+│       └── sample
+│           ├── HistGradientBoostingClassifier_PR.png
+│           ├── HistGradientBoostingClassifier_ROC.png
+│           ├── HistGradientBoostingClassifier_test_cm.png
+│           ├── HistGradientBoostingClassifier_train_cm.png
+│           ├── Logistic_Regression_PR.png
+│           ├── Logistic_Regression_ROC.png
+│           ├── Logistic_Regression_test_cm.png
+│           └── Logistic_Regression_train_cm.png
+├── requirements.txt
+├── src
+│   ├── app.py
+│   └── sparkifychurn
+│       ├── __init__.py
+│       ├── cleanData.py
+│       ├── evaluateModel.py
+│       ├── exploreData.py
+│       ├── generateFeatures.py
+│       ├── trainModel.py
+│       └── utils.py

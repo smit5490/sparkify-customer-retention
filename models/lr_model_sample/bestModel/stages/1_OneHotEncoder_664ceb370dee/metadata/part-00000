@@ -1,1 +1,0 @@
-{"class":"org.apache.spark.ml.feature.OneHotEncoderModel","timestamp":1642044988901,"sparkVersion":"3.2.0","uid":"OneHotEncoder_664ceb370dee","paramMap":{"inputCol":"gender_idx","outputCol":"gender_ohe"},"defaultParamMap":{"handleInvalid":"error","dropLast":true,"outputCol":"OneHotEncoder_664ceb370dee__output"}}
