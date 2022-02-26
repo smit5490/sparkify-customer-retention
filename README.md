@@ -108,8 +108,8 @@ Azure Databricks Runtime Version 10.1. All of the Spark code is based on v3.2.0.
 │       └── utils.py
 ```
 ### File Descriptions
-**app.py** - Sparkify Churn Prediction Model Dashboard built with Streamlit. 
-**mini_sparkify_event_data.json** - Sample customer logs provided by Sparkify.  
+**app.py** - Sparkify Churn Prediction Model Dashboard built with Streamlit.  
+**mini_sparkify_event_data.json** - Sample customer logs provided by Sparkify.    
 **test_data_full** - Parquet files containing the full test data set.  
 **test_data_sample** - Parquet files containing a sample test data set.  
 **train_data_full** - Parquet files containing the full training data set.  
