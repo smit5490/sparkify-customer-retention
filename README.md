@@ -1,7 +1,7 @@
 # Customer Retention Modeling using Spark, SHAP, and Streamlit  
 
 ## Background
-One major challenge with a subscription-based service is retaining the customer base. A fictitious digital music 
+One major challenge with a subscription-based service is retaining customers. A fictitious digital music 
 company, Sparkify, is looking to implement a customer retention strategy to reduce churn. Customers use their platform
 to stream music using either a free or paid subscription. Their data engineering team has set-up user monitoring logs that tracks
 how customers use their platform. Sparkify would like to explore the use of these logs to determine if they can predict
@@ -141,18 +141,25 @@ scaled up the work using Microsoft Azure Databricks. Using a Spark cluster, I cl
 ### Model Training & Evaluation
 There are four notebooks associated with model training and evaluation. Initial development took place using 
 `2_spark_model_training_evaluation_sample.ipynb`.  Once the model training pipelines were set-up, and model evaluation 
-functions were written in `sparkify`, they were scaled on Databricks in `2_databricks_train_eval_spark_model_full_data.ipynb`. 
-![Databricks Application](images/db_screenshot.png). *Mlflow* was used to track model performance and persisting the 
-model object.  
+functions were written in `sparkify`, they were scaled on Databricks in `2_databricks_train_eval_spark_model_full_data.ipynb`.  
+ 
+![Databricks Application](images/db_screenshot.png)  
+
+*Mlflow* was used to track model experiments and persisting the model object:  
+  
+![mlflow](./images/mlflow.png)  
+
 Similar scikit-learn models were also explored for their feasibility. While the initial log file was large, transforming 
 it into one-row per customer significantly reduced its dimensionality, making scikit-learn models an option. 
-These two notebooks are 
+The two associated notebooks are 
  `2_sklearn_model_training_evaluation_sample.ipynb` and  `2_sklearn_model_training_evaluation_full.ipynb`. 
 
 ### Model Explainability 
 After training and evaluating the models, the top scikit-learn model was used to calculate shapely
-values. The overall feature importance/summary plot and an example of an individual observation's shapely values can be 
-found in `3_prediction_explainers.ipynb `.
+values. [SHAP]( identifies the most informative relationships between the input features) identifies the most 
+informative relationships between the input features and the predicted outcome (e.g. `churn`), which is useful for 
+explaining how the model arrived at it's prediction. The overall feature importance/summary plot and an example of an 
+individual observation's shapely values can be found in `3_prediction_explainers.ipynb `.
 
 
 ### Web Application
@@ -162,8 +169,10 @@ easy to use interface. To use the web application, type in the command line in t
 streamlit run app.py
 ```
 Once the application loads, it will be available on a local port:  
-![Streamlit Run](images/streamlit_run.png)
 
+![st cml](images/streamlit_run.png)
+
+When you navigate to the webpage, you should see the following dashboard render:  
 ![Streamlit Application](images/st_app.png)
 
 ## Analysis
@@ -177,31 +186,74 @@ history.
 
 The 22,278 customers were divided into a train/test split using proportional stratification on the target feature 
 e.g. `churn`). For additional exploratory data analysis and feature engineering development, check out 
-`1_eda_cleaning_feature_engineering_sample.ipynb`.
-
+`1_eda_cleaning_feature_engineering_sample.ipynb`.  
 
 Four models were hyperparameter tuned via cross-validation on the train set and evaluated based on their
 average precision, F1-score, and AUROC on the test set. The decision to focus on precision is due to the 
 moderate class imbalance in the target feature.  These models include:  
   
 **PySpark Models:**   
-* (Penalized) Logistic Regression
+* Logistic Regression
 * GBTClassifier
 
 **Scikit-Learn Models:**
-* (Penalized) Logistic Regression 
+* Logistic Regression 
 * HistGradientBoostingClassifier
 
 The trained models are saved in the `models` directory and the model performance plots are available in the `output` 
 folder.
+
+The model results are shown in the table below.
 
 | Model | Type | F1-Score | Average Precision |	AUROC |
 |----|-----|-----|-----|-----|
 | Logistic Regression | Spark | 0.63 | 0.69 | 0.88 |  
 | Logistic Regression | Scikit-Learn | 0.63 | 0.68 | 0.88 | 
 | Gradient Boosting Classifier	| Spark | 0.73 | 0.82 | 0.92 |
-| **Histogram-based Gradient Boosting Classier** | Scikit-Learn	| 0.77 | 0.85 | 0.93 |
+| **Histogram-based Gradient Boosting Classier** | Scikit-Learn	| 0.77 | 0.84 | 0.93 |
+
+ The gradient boosting tree classifiers have higher performance metrics overall, with the scikit-learn model having a 
+ slight edge over its spark counterpart. Below are the ROC and PR curves for the top model:
+ 
+![ROC Curve](./output/sklearn/full/HistGradientBoostingClassifier_ROC.png)
+![PR Curve](./output/sklearn/full/HistGradientBoostingClassifier_PR.png)   
+![CM](./output/sklearn/full/HistGradientBoostingClassifier_test_cm.png)  
+
+The HistGradientBoostingClassifier model has some slight overfitting, but is still the best choice. The trained model 
+object is used to predict churn likelihood and compute model explainers via SHAP.
+
 
 ## Findings
-Summarize end-to-end problem solution and 2 aspects found interesting or difficult
-Discuss possible impro### Databricksvements. 
+### Feature Importance
+To calculate feature importance, SHAP values are calculated for each observation (e.g. customer) and their magnitudes 
+are summed up for each feature and sorted from most to least. The SHAP values for the top 10 features are displayed as a 
+density scatter plot below:  
+
+![shap_summary](./output/shap_summary.png)
+
+The feature that had the highest impact on the churn prediction is a customer's tenure. The longer a customer has been a
+member of the streaming service, the more likely they are to stay. Using a dependence plot, we can see how SHAP values 
+are impacted by tenure and subscription type (e.g. paid vs free) in the Streamlit application: 
+![dep_plot](./images/var_dep_tenure.png)
+
+Other notable features and their effects include: 
+
+* `downgrade_rate`: Customers that cancelled their paid subscription are more likely to completely cancel their account.
+* `thumbs_up_rate` & `thumbs_up_pct`: Customers that like the songs played more often have a lower risk of churn. 
+* `advert_count` & `advert_rate`: More advertisements result in a higher risk of churn. 
+* `avg_songs_session`: Customers that listen to more songs a session have a lower risk of churn.
+
+### Target Customers  
+Using the Streamlit application and filtering for only active customers with at least a 50% probability of churn yield
+476 customers to target for their customer retention strategy. 
+
+### Challenges & Opportunities 
+Using Microsoft Azure Databricks was a great experience and I really enjoyed the integration with *mlflow* and the 
+Databricks File System (DBFS) to save modeling outputs. I was able to perform data cleaning and feature engineering at 
+scale with relative ease and fairly fast performance. However, when training PySpark models on only ~22,000 customers, 
+the performance was slower than using scikit-learn even after using coalesce to minimize data shuffling for such a small 
+data set. Using a combination of Spark for data cleaning and feature engineering and scikit-learn for model training and 
+inference is the optimal solution. 
+
+One key improvement would be to create scripts from the Jupyter notebooks to be run on a scheduled basis to regularly 
+update the data cleaning, feature engineering and model training pipelines. 

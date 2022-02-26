@@ -23,14 +23,17 @@ st.info("""
         """)
 
 # Get data and model
+train = pd.read_parquet("./data/train_data_full")
 test = pd.read_parquet("./data/test_data_full")
+data = pd.concat([train,test])
+data = data.reset_index(drop=True)
 gbc_model = joblib.load("./models/sklearn_gbc_full.pkl")
-X_test = test.drop("churn", axis = 1)
-y_test = test[["churn"]]
-X_test_means = X_test.iloc[:,2:].mean()
+X_data = data.drop("churn", axis = 1)
+y_test = data[["churn"]]
+X_data_means = X_data.iloc[:,2:].mean()
 
 # Get predictions
-preds = gbc_model.predict_proba(X_test)[:,1]*100
+preds = gbc_model.predict_proba(X_data)[:,1]*100
 
 # Get variable names
 vars1 = gbc_model["preprocessing"].transformers_[0][1][1].get_feature_names_out().tolist()
@@ -47,7 +50,7 @@ likelihood = st.sidebar.slider("Churn Probability:",
                                max_value = int(preds.max()),
                                value = (int(preds.min()),int(preds.max())))
 
-preds = pd.concat([test,pd.Series(preds, name = "prob")], axis = 1)
+preds = pd.concat([data,pd.Series(preds, name = "prob")], axis = 1)
 preds = preds[(preds["prob"]>likelihood[0]) & (preds["prob"]<likelihood[1])]
 
 if active_acct:
@@ -55,23 +58,25 @@ if active_acct:
 
 userId_ls = preds["userId"].tolist()
 
+
+st.sidebar.write("Number of customers remaining: {}".format(preds.shape[0]))
 st.sidebar.markdown("## Select User ID:")
 userId = st.sidebar.selectbox("User ID", userId_ls)
 
 run_button = True
 if run_button:
-    user_summary = X_test[X_test["userId"] == userId]
-    user_index = X_test[X_test["userId"] == userId].index
+    user_summary = X_data[X_data["userId"] == userId]
+    user_index = X_data[X_data["userId"] == userId].index
 
     # make prediction
     gbc_prob = gbc_model.predict_proba(user_summary)[0][1]
 
     # Compute SHAP values for model:
-    X_test_preprocessed = gbc_model['preprocessing'].transform(X_test)
+    X_data_preprocessed = gbc_model['preprocessing'].transform(X_data)
     explainer = shap.Explainer(gbc_model['model'])
 #    st.write(explainer.expected_value)
     # Compute shap value for selected user
-    shap_values = explainer.shap_values(X_test_preprocessed, check_additivity=False)
+    shap_values = explainer.shap_values(X_data_preprocessed, check_additivity=False)
 
     # Main Panel
     str_title = "Usage Summary for: {}".format(userId)
@@ -86,7 +91,7 @@ if run_button:
                   )
     with col2:
         age = user_summary["tenure_days"].values[0]
-        avg_age = X_test_means["tenure_days"]
+        avg_age = X_data_means["tenure_days"]
         age_diff = age - avg_age
         st.metric(label = "Account Age (Days)",
                   value = round(age),
@@ -98,7 +103,7 @@ if run_button:
                   value = sub)
     with col4:
         thumbs_up_pct = user_summary["thumbs_up_pct"].values[0]
-        mean_thumbs_up_pct = X_test_means["thumbs_up_pct"]
+        mean_thumbs_up_pct = X_data_means["thumbs_up_pct"]
         thumbs_diff = thumbs_up_pct - mean_thumbs_up_pct
         st.metric(label = "Thumbs Up %",
                   value = str(round(thumbs_up_pct*100)),
@@ -107,14 +112,14 @@ if run_button:
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         advert_rate = user_summary["advert_rate"].values[0]
-        mean_advert_rate = X_test_means["advert_rate"]
+        mean_advert_rate = X_data_means["advert_rate"]
         advert_diff = advert_rate - mean_advert_rate
         st.metric(label="Advert. Rate (per hour)",
                   value=str(round(advert_rate,2)),
                   delta = round(advert_diff,2))
     with col2:
         number_sessions = user_summary["session_count"].values[0]
-        avg_number_sessions = X_test_means["session_count"]
+        avg_number_sessions = X_data_means["session_count"]
         session_diff = number_sessions - avg_number_sessions
 
         st.metric(label="Number of Sessions",
@@ -122,14 +127,14 @@ if run_button:
                   delta = round(session_diff))
     with col3:
         avg_session_length_hours = user_summary["avg_session_length_hours"].values[0]
-        avg_avg_session_length_hours = X_test_means["avg_session_length_hours"]
+        avg_avg_session_length_hours = X_data_means["avg_session_length_hours"]
         avg_session_length_hours_diff = avg_session_length_hours - avg_avg_session_length_hours
         st.metric(label="Average Session Length",
                   value=round(avg_session_length_hours),
                   delta = round(avg_session_length_hours_diff))
     with col4:
         non_int_rate = user_summary["non_song_interaction_rate"].values[0]
-        avg_non_int_rate = X_test_means["non_song_interaction_rate"]
+        avg_non_int_rate = X_data_means["non_song_interaction_rate"]
         non_int_rate_diff = non_int_rate - avg_number_sessions
         st.metric(label = "Non-song Int. Rate",
                   value = round(non_int_rate,2),
@@ -146,7 +151,7 @@ if run_button:
     st.write(" ### Force Plot")
     fig = shap.force_plot(explainer.expected_value,
                           shap_values[user_index,:],
-                          X_test_preprocessed[user_index,:].round(4),
+                          X_data_preprocessed[user_index,:].round(4),
                           feature_names=var_names,
                           show=False,
                           matplotlib=True,
@@ -196,7 +201,7 @@ if run_button:
 
     shap.dependence_plot(ind_var,
                         shap_values,
-                        X_test_preprocessed,
+                        X_data_preprocessed,
                         feature_names=var_names,
                         interaction_index=int_var,
                         ax = ax,
