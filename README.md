@@ -49,10 +49,8 @@ Azure Databricks Runtime Version 10.1. All of the Spark code is based on v3.2.0.
 │   ├── spark_gbt_model_sample
 │   └── spark_lr_model_sample
 ├── notebooks                                   # Jupyter notebooks used to develop models
-│   ├── 1_databricks_cleaning_feature_engineering_full_data.html
 │   ├── 1_databricks_cleaning_feature_engineering_full_data.ipynb
 │   ├── 1_eda_cleaning_feature_engineering_sample.ipynb
-│   ├── 2_databricks_train_eval_spark_model_full_data.html
 │   ├── 2_databricks_train_eval_spark_model_full_data.ipynb
 │   ├── 2_sklearn_model_training_evaluation_full.ipynb
 │   ├── 2_sklearn_model_training_evaluation_sample.ipynb
@@ -117,9 +115,9 @@ Azure Databricks Runtime Version 10.1. All of the Spark code is based on v3.2.0.
 **train_data_full** - Parquet files containing the full training data set.  
 **train_data_sample** - Parquet files containing a sample training data set.  
 
-**1_databricks_cleaning_feature_engineering_full_data.[ipynb|html]** - Clean data and engineer features at scale using Databricks.  
+**1_databricks_cleaning_feature_engineering_full_data.ipynb** - Clean data and engineer features at scale using Databricks.  
 **1_eda_cleaning_feature_engineering_sample.ipynb** - Clean data and engineer features for a sample of data.  
-**2_databricks_train_eval_spark_model_full_data.[ipynb|html]** - Train PySpark models on the full dataset using Databricks.   
+**2_databricks_train_eval_spark_model_full_data.ipynb** - Train PySpark models on the full dataset using Databricks.   
 **2_sklearn_model_training_evaluation_full.ipynb** - Train scikit-learn models on full data set.  
 **2_sklearn_model_training_evaluation_sample.ipynb** - Train scikit-learn models on sample data set.  
 **2_spark_model_training_evaluation_sample.ipynb** - Train PySpark models on a sample data set.  
@@ -139,15 +137,13 @@ There are two notebooks associated with exploratory data analysis, cleaning, and
 `1_eda_cleaning_feature_engineering_sample.ipynb` where I thoroughly explored a sample of the data and wrote some data 
 cleaning functions available in the `sparkifychurn` package. Once I had developed code to clean and engineer the data, I 
 scaled up the work using Microsoft Azure Databricks. The associated notebook is 
-`1_databricks_cleaning_feature_engineering_full_data.[ipynb|html]`. The html version can be uploaded and used directly in
-Databricks. 
+`1_databricks_cleaning_feature_engineering_full_data.ipynb`.
 
 ### Model Training & Evaluation
 There are four notebooks associated with model training and evaluation. Initial development took place using 
 `2_spark_model_training_evaluation_sample.ipynb`.  Once the model training pipelines were set-up, and model evaluation 
 functions were written in `sparkify`, they were scaled on Databricks in 
-`2_databricks_train_eval_spark_model_full_data.[ipynb|html]`.  The html version can be uploaded and used directly in
-Databricks. 
+`2_databricks_train_eval_spark_model_full_data.ipynb`.
  
 ![Databricks Application](images/db_screenshot.png)  
 
