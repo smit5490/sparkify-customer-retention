@@ -1,6 +1,6 @@
 # Customer Retention Modeling using Spark, SHAP, and Streamlit  
 
-## Background
+## Project Definition
 One major challenge with a subscription-based service is retaining customers. A fictitious digital music 
 company, Sparkify, is looking to implement a customer retention strategy to reduce churn. Customers use their platform
 to stream music using either a free or paid subscription. Their data engineering team has set-up user monitoring logs that tracks
