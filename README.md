@@ -221,7 +221,8 @@ The model results are shown in the table below.
 ![PR Curve](./output/sklearn/full/HistGradientBoostingClassifier_PR.png)   
 ![CM](./output/sklearn/full/HistGradientBoostingClassifier_test_cm.png)  
 
-The HistGradientBoostingClassifier model has some slight overfitting, but is still the best choice. The trained model 
+The HistGradientBoostingClassifier model has some slight overfitting, but is still the best choice. It trained faster 
+than its Spark counterpart and the pipeline object is compatible with SHAP. The trained model 
 object is used to predict churn likelihood and compute model explainers via SHAP.
 
 
