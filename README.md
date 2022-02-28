@@ -181,7 +181,7 @@ are two associated notebooks with scikit-learn modeling pipelines:
 * [2_sklearn_model_training_evaluation_full.ipynb](./notebooks/2_sklearn_model_training_evaluation_full.ipynb)
 
 
-### Model Evaluation and Validation
+## Model Evaluation & Validation
 Four models were hyperparameter tuned via cross-validation on the train set and evaluated based on their
 average precision, F1-score, and AUROC on the test set: 
   
@@ -218,6 +218,14 @@ The HistGradientBoostingClassifier model has some slight overfitting, but is the
 trained faster than its Spark counterpart, and the pipeline object is compatible with SHAP. This model was recommended to
 the business as a means to predict churn and compute model explainers via SHAP.
 
+### Model Explainability 
+After training and evaluating the models, the HistGradientBoostingClassifier model object was used to calculate shapely
+values. [SHAP](https://shap.readthedocs.io/en/latest/) identifies the most informative relationships between the input 
+features and the predicted outcome (e.g. `churn`), which is useful for explaining how the model arrived at it's 
+prediction. The overall feature importance/summary plot and an example of an individual observation's shapely values can 
+be found in [3_prediction_explainers.ipynb](./notebooks/3_prediction_explainers.ipynb). Feature importance for 
+individual customers via SHAP can be found in the Streamlit dashboard.
+
 ## Findings
 ### Feature Importance
 To calculate feature importance, SHAP values are calculated for each observation (e.g. customer) and their magnitudes 
@@ -240,7 +248,8 @@ Other notable features and their effects include:
 
 ### Target Customers  
 Using the Streamlit application and filtering for only active customers with at least a 50% probability of churn yield
-476 customers to target for their customer retention strategy. 
+476 customers to target for their customer retention strategy. Drivers of churn for these individual customers can be 
+explored using the Streamlit application.
 
 ## Reflection
 Using Microsoft Azure Databricks was a great experience and I really enjoyed the integration with *mlflow* and the 
