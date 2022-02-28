@@ -102,7 +102,7 @@ A custom PySpark function, [clean_logs()](./src/sparkifychurn/cleanData.py), was
 logs with a `userId`, and fill missing `length` values with 0. The `length` feature refers to the duration of the music 
 playing in seconds. After doing an initial cleaning, the log file needed to be aggregated to the customer level for 
 model training and inference. To generate features, a custom PySpark function, 
-[generate_featuers()](./src/sparkifychurn/generateFeatures.py), was written. This function summarizes the data 
+[generate_features()](./src/sparkifychurn/generateFeatures.py), was written. This function summarizes the data 
 with respect to the `userId` and `sessionId`. The `sessionId` is a single continuous set of interactions
 between a customer and the Sparkify platform. If a customer leaves the platform or logs out and returns, a new 
 `sessionId` is created. The target feature is also created in this function. It is a binary flag indicating if a customer 
