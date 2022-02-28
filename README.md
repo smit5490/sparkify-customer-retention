@@ -65,7 +65,7 @@ A tree-diagram of the repository's structure can be found [here](tree.txt).
 **prediction_explainers.ipynb** - Explore top model's SHAP values.  
 
 
-*Directories:*  
+### Directories  
 **output/pyspark/full** - PySpark model performance plots  on full data set.  
 **output/pyspark/sample** - PySpark model performance plots on sample data.  
 **output/sklearn/full** - Scikit-learn model performance plots  on full data set.  
@@ -74,9 +74,9 @@ A tree-diagram of the repository's structure can be found [here](tree.txt).
 **src/sparkifychurn** - Python package containing key functions to process data and train PySpark models. 
   
 ## Raw Data Exploration & Visualization
-The raw 12GB customer log file was read into the Spark cluster from an 
-[S3 bucket]("s3n://udacity-dsnd/sparkify/sparkify_event_data.json). Each row corresponds with a 'customer interaction' 
-with the streaming platform. The top 5 rows are shown below: 
+The raw 12GB customer log file was read into a Databricks Spark cluster from an 
+[S3 bucket]("s3n://udacity-dsnd/sparkify/sparkify_event_data.json). Each row corresponds to a customer interaction 
+with the streaming platform. The top 5 rows of the raw data are shown below: 
    
 ![raw_logs](./images/raw_logs.png)  
 
@@ -91,25 +91,24 @@ feature is only populated when a log entry is capturing a new song playing. Ther
 log data where the `userId` was missing. The timestamps also needed to be converted into a format that could be used to 
 compute the total duration of customer listening sessions. 
 
-A key column in the data that best describes the customer interaction is `page`. The different interaction types and 
-their counts are shown in the sorted bar plot below: 
+A key column in the data that best describes the type of customer interaction is `page`. 
+The different interaction types and their counts are shown in the sorted bar plot below: 
 ![page_count](./images/page_counts.png) 
 
-Using the various customer interaction types will be key in understanding their likelihood of churn.  
+Using the various customer interaction types will be key in predicting churn. 
 
 ## Data Preprocessing & Feature Engineering
 A custom PySpark function, [clean_logs()](./src/sparkifychurn/cleanData.py), was written to clean up timestamps, remove 
 logs with a `userId`, and fill missing `length` values with 0. The `length` feature refers to the duration of the music 
-playing. After doing the initial cleaning, the log file needed to be aggregated to the customer level for model training 
-and inference. To generate features, a custom PySpark function, 
-[generate_featuers()](./src/sparkifychurn/generateFeatures.py), was written. This function summarizes the data in 
-various ways with respect to the `userId` and `sessionId`. The `sessionId` is a single continuous session of interaction
+playing in seconds. After doing an initial cleaning, the log file needed to be aggregated to the customer level for 
+model training and inference. To generate features, a custom PySpark function, 
+[generate_featuers()](./src/sparkifychurn/generateFeatures.py), was written. This function summarizes the data 
+with respect to the `userId` and `sessionId`. The `sessionId` is a single continuous set of interactions
 between a customer and the Sparkify platform. If a customer leaves the platform or logs out and returns, a new 
-`sessionId` is created. As mentioned earlier, many of the features are counting the number of times a `userId` has a 
-particular `page` interaction. The target feature is created at this stage and is a binary flag indicating if a customer 
-has a "Cancellation Confirmation" `page` interaction This page interaction occurs when a customer cancels their account.
-feature engineering function results in 49 features that summarizes a customer's usage history. Rates of interactions are
-also computed. These rates indicate how often certain interactions occur in relation to a customer's total engagement 
+`sessionId` is created. The target feature is also created in this function. It is a binary flag indicating if a customer 
+has a "Cancellation Confirmation" `page` interaction. This page interaction occurs when a customer cancels their account.
+The feature engineering function results in 49 features that summarizes a customer's usage history. Rates of interactions are
+also computed. These rates indicate how often certain interactions occur in relation to the customer's total engagement 
 time with the platform. A high level summary of the data is shown in the table below:
 
 | Number of Rows | Number of customers | # Customers Churned |
@@ -117,11 +116,11 @@ time with the platform. A high level summary of the data is shown in the table b
 | 26,259,199 | 22,278 | 5,003 (22%)|
 
 ## Train-Test Split 
-The 22,278 customers/rows were divided into a 70/30 train-test split using 
+The 22,278 customer rows were divided into a 70/30 train-test split using 
 [proportional stratification](./src/sparkifychurn/utils.py) on the target feature (e.g. `churn`).
 
-**Train Size:** (15438,50)  
-**Test Size:** (6840,50)
+**Train Size:** (15438, 50)  
+**Test Size:** (6840, 50)
 
 ## Training Data Exploration & Visualization
 
@@ -138,11 +137,13 @@ The training data indicates that active customers have, on average:
   
 It's difficult to say if these uni-variate trends hold true during modeling. Looking at violin plots of some of these 
 features indicate skew. For example, there are some customers with abnormally high advertisement rates: 
-![advert_plot](./images/advert_plot.png) Model explainability via SHAP will help confirm these trends to see if they 
-hold true globally as well as for individual customers.  
+![advert_plot](./images/advert_plot.png)  
+  
+Model explainability via SHAP will help confirm these trends to see if they hold true globally as well as for individual 
+customers.  
   
 Additional feature exploration on the training data can be found in 
- [1_databricks_cleaning_feature_engineering_full_data.ipynb](./notebooks/1_databricks_cleaning_feature_engineering_full_data.ipynb). 
+[1_databricks_cleaning_feature_engineering_full_data.ipynb](./notebooks/1_databricks_cleaning_feature_engineering_full_data.ipynb). 
 Note that this notebook requires Databricks to run. For a similar analysis on a much smaller data sample that can be 
 explored using a laptop can be found in
 [1_eda_cleaning_feature_engineering_sample.ipynb](./notebooks/1_eda_cleaning_feature_engineering_sample.ipynb).  
@@ -153,8 +154,8 @@ The notebooks associated with initial development are:
 * [1_eda_cleaning_feature_engineering_sample.ipynb](./notebooks/1_eda_cleaning_feature_engineering_sample.ipynb)
 * [2_spark_model_training_evaluation_sample.ipynb](./notebooks/2_spark_model_training_evaluation_sample.ipynb)
 
-After doing the initial analysis locally, I packaged up the key modeling functions into the `sparkifychurn` package found 
-in the src folder. Using these functions, I ran the end-to-end modeling pipeline at scale on Databricks using:
+After doing the initial analysis locally, I packaged up the key modeling functions into the [sparkifychurn](./src/sparkifychurn)
+ package found in the src folder. Using these functions, I ran the end-to-end modeling pipeline at scale on Databricks using:  
 * [1_databricks_cleaning_feature_engineering_full_data.ipynb](./notebooks/1_databricks_cleaning_feature_engineering_full_data.ipynb)
 * [2_databricks_train_eval_spark_model_full_data.ipynb](./notebooks/2_databricks_train_eval_spark_model_full_data.ipynb)
 
@@ -164,18 +165,18 @@ in the src folder. Using these functions, I ran the end-to-end modeling pipeline
 
 ### Refinement
 Building the data cleaning and feature engineering functionality on the sample data did not cover all of the same data
-quality issues that were found in the data at scale. For example, a customer's gender missing in the full
+quality issues that were found in the data at scale. For example, a customer's gender  was missing in the full
 data set but not in the sample provided by the business. The data pre-processing pipeline was updated to accommodate 
-missing gender during scoring by creating a new factor level for that feature. 
+missing gender during scoring by creating a new category for that feature. 
 
-There were also performance challenges with running model training at scale with hyperparameter tuning via grid-search
+There were also performance challenges with running model training at scale using hyperparameter tuning via grid-search
 and 5-fold cross-validation. As a result, I had to lower the number of folds to two and coalesce the dataframe down to 
-a single partition. Reducing data to a single partition when the data set is small reduces data shuffles that can greatly
-increase runtime. As a result, training time was reduced from hours to about 15 minutes. 
+a single partition. Reducing data to a single partition when the data set is small reduces data shuffles across the 
+cluster and can greatly improve runtime. As a result, training time was reduced from hours to about 15 minutes. 
 
 Similar scikit-learn models were also explored for their feasibility. While the initial log file was large, transforming 
-it into one-row per customer significantly reduced its dimensionality, making scikit-learn models an option. There are 
-two associated notebooks with scikit-learn modeling pipelines: 
+it into one-row per customer significantly reduced its dimensionality allowing scikit-learn models as an option. There 
+are two associated notebooks with scikit-learn modeling pipelines: 
 * [2_sklearn_model_training_evaluation_sample.ipynb](./notebooks/2_sklearn_model_training_evaluation_sample.ipynb)
 * [2_sklearn_model_training_evaluation_full.ipynb](./notebooks/2_sklearn_model_training_evaluation_full.ipynb)
 
@@ -193,9 +194,7 @@ average precision, F1-score, and AUROC on the test set:
 * HistGradientBoostingClassifier
 
 The trained models are saved in the `models` directory and the model performance plots are available in the `output` 
-folder.
-
-The model results are shown in the table below.
+folder. The model results are shown in the table below.  
 
 | Model | Type | F1-Score | Average Precision |	AUROC |
 |----|-----|-----|-----|-----|
@@ -206,7 +205,7 @@ The model results are shown in the table below.
 
 
 ### Model Selection & Justification
-The gradient boosting tree classifiers have higher performance metrics overall, with the scikit-learn model having a  
+The gradient boosting tree classifiers have higher performance metrics overall, with the scikit-learn model having a 
 slight edge over its Spark counterpart. The results are not surprising. Tree-based methods allow non-linear patterns to 
 be modeled, unlike logistic regression. Furthermore, the use of boosting iterations allow subsequent trees to better 
 model observations by focusing on those with higher prediction error. Below are the ROC and PR curves for the top model:  
@@ -243,7 +242,7 @@ Other notable features and their effects include:
 Using the Streamlit application and filtering for only active customers with at least a 50% probability of churn yield
 476 customers to target for their customer retention strategy. 
 
-### Reflection
+## Reflection
 Using Microsoft Azure Databricks was a great experience and I really enjoyed the integration with *mlflow* and the 
 Databricks File System (DBFS) to save modeling outputs. I was able to perform data cleaning and feature engineering at 
 scale with relative ease and fairly fast performance. However, when training PySpark models on only ~22,000 customers, 
@@ -252,7 +251,7 @@ data set. Using a combination of Spark for data cleaning and feature engineering
 inference is the optimal solution. 
 
 
-### Improvement
+### Future Improvements
 One key improvement would be to create scripts from the Jupyter notebooks to be run on a scheduled basis to regularly 
 update the data cleaning, feature engineering and model training pipelines. While there are some ways to "deploy" 
 Jupyter notebooks, scripts are more widely deployable and the defacto method for production pipelines. 
