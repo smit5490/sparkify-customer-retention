@@ -75,7 +75,7 @@ A tree-diagram of the repository's structure can be found [here](tree.txt).
   
 ## Raw Data Exploration & Visualization
 The raw 12GB customer log file was read into a Databricks Spark cluster from an 
-[S3 bucket]("s3n://udacity-dsnd/sparkify/sparkify_event_data.json). Each row corresponds to a customer interaction 
+[S3 bucket](s3n://udacity-dsnd/sparkify/sparkify_event_data.json). Each row corresponds to a customer interaction 
 with the streaming platform. The top 5 rows of the raw data are shown below: 
    
 ![raw_logs](./images/raw_logs.png)  
