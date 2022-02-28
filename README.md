@@ -1,5 +1,7 @@
 # Customer Retention Modeling using Spark, SHAP, and Streamlit  
 
+![readme_banner](./images/readme_banner.png)
+
 ## Project Overview
 One major challenge of a subscription-based service is retaining customers. A fictitious digital music 
 company, Sparkify, wants to implement a customer retention strategy to reduce churn. Customers use their platform
@@ -14,9 +16,9 @@ usage patterns contribute most to their elevated level of risk. All of this shou
 application.
 
 ### Metrics
-The model with the highest average precision on the test will be selected and used as a basis to predict customer churn and as 
-an input to calculate SHAP values for each customer. The decision to focus on precision is due to the 
-moderate class imbalance in the target feature. The prediction combined with the model explainability provided by 
+The model with the highest F1-score and average precision on the test will be selected and used as a basis to predict 
+customer churn and as an input to calculate SHAP values for each customer. The decision to focus on precision is due to 
+the moderate class imbalance in the target feature. The prediction combined with the model explainability provided by 
 SHAP will give the business insight into what is driving the model's predictions.
 
 ## Set-Up & Installation
@@ -182,8 +184,8 @@ are two associated notebooks with scikit-learn modeling pipelines:
 
 
 ## Model Evaluation & Validation
-Four models were hyperparameter tuned via cross-validation on the train set and evaluated based on their
-average precision, F1-score, and AUROC on the test set: 
+Four models were hyperparameter tuned via randomized grid search and 5-fold cross-validation on the training data. The 
+models with the best hyperparameters were evaluated based on their average precision, F1-score, and AUROC on the test set: 
   
 **PySpark Models:**   
 * Logistic Regression
@@ -202,7 +204,6 @@ folder. The model results are shown in the table below.
 | Logistic Regression | Scikit-Learn | 0.63 | 0.68 | 0.88 | 
 | Gradient Boosting Classifier	| Spark | 0.73 | 0.82 | 0.92 |
 | **Histogram-based Gradient Boosting Classier** | Scikit-Learn	| 0.77 | 0.84 | 0.93 |
-
 
 ### Model Selection & Justification
 The gradient boosting tree classifiers have higher performance metrics overall, with the scikit-learn model having a 
