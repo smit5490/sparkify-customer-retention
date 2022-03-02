@@ -3,23 +3,23 @@
 ![readme_banner](./images/readme_banner.png)
 
 ## Project Overview
-One major challenge of a subscription-based service is retaining customers. A fictitious digital music 
+One major challenge in running a subscription-based service is retaining customers. A fictitious digital music 
 company, Sparkify, wants to implement a customer retention strategy to reduce churn. Customers use their platform
-to stream music using either a free or paid subscription. Their data engineering team has set-up user monitoring logs that tracks
-how customers interact with their platform. Every time a new song plays, a customer clicks the web page, or thumbs-up a 
+to stream music using either a free or paid subscription. Their data engineering team has set-up user monitoring logs that track
+how customers interact with their platform. Every time a new song plays, a customer clicks a link, thumbs-up a 
 song, etc., a log entry is created. 
 
 ### Problem Statement
-Sparkify would like to use their customer logs to model customer behavior and determine which active customer have a high
-likelihood of churn (e.g. cancelling their account). Furthermore, the business would like to understand what customer 
+Sparkify would like to use their customer log data to model customer behavior and determine which active customers have a high
+likelihood of churn (e.g. account cancellation). Furthermore, the business would like to understand what customer 
 usage patterns contribute most to their elevated level of risk. All of this should be displayed in an easy to use web
 application.
 
 ### Metrics
-The model with the highest F1-score and average precision on the test will be selected and used as a basis to predict 
+The model with the highest F1-score and average precision on the test set will be selected and used as a basis to predict 
 customer churn and as an input to calculate SHAP values for each customer. The decision to focus on precision is due to 
-the moderate class imbalance in the target feature. The prediction combined with the model explainability provided by 
-SHAP will give the business insight into what is driving the model's predictions.
+the moderate class imbalance in the target feature. The prediction combined with model explainability via SHAP will give 
+the business insight into what is driving predictions.
 
 ## Set-Up & Installation
 
@@ -31,8 +31,11 @@ pip install -r requirements.txt
 ```
 
 This project also leveraged [Microsoft Azure Databricks](https://azure.microsoft.com/en-us/free/databricks/) to perform 
-data cleaning, feature engineering, and model training at scale. There are two *.ipynb files that require Microsoft 
-Azure Databricks Runtime Version 10.1. All of the Spark code is based on v3.2.0. 
+data cleaning, feature engineering, and model training at scale. There are two Jupyter notebooks that require Microsoft 
+Azure Databricks Runtime Version 10.1. All of the Spark code is based on v3.2.0. Details of my specific cluster 
+configuration are shown in the image below:
+
+![cluster_config](./images/cluster_config.png)
 
 ### Web Application
 The Streamlit web application ties relevant customer attributes, churn prediction, and drivers of churn together in an 
@@ -44,7 +47,7 @@ Once the application loads, it will be available on a local port:
 
 ![st cml](images/streamlit_run.png)
 
-When you navigate to the webpage, you should see the following dashboard render:  
+When you navigate to the webpage, you should see a dashboard render:  
 ![Streamlit Application](images/st_app.png)
 
 ## Repository Structure
