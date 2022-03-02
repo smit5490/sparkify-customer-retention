@@ -3,7 +3,7 @@
 ![readme_banner](./images/readme_banner.png)
 
 ## Project Overview
-One major challenge in running a subscription-based service is retaining customers. A fictitious digital music 
+A fictitious digital music 
 company, Sparkify, wants to implement a customer retention strategy to reduce churn. Customers use their platform
 to stream music using either a free or paid subscription. Their data engineering team has set-up user monitoring logs that track
 how customers interact with their platform. Every time a new song plays, a customer clicks a link, thumbs-up a 
