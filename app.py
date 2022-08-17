@@ -208,7 +208,7 @@ if run_button:
                         alpha=.25)
 
     st.pyplot(fig)
-# Dependance plots expander explanations
+# Dependence plots expander explanations
 with st.expander("More on dependence plots"):
      st.markdown("""
      From the SHAP documentation:

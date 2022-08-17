@@ -1,0 +1,9 @@
+joblib
+matplotlib
+numpy
+pandas
+plotly
+seaborn
+shap
+streamlit
+scikit_learn==1.0.1
